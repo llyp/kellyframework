@@ -76,7 +76,7 @@ func checkServiceMethodPrototype(methodType reflect.Type) error {
 		return fmt.Errorf("the first argument should be type *ServiceMethodContext")
 	}
 
-	if methodType.In(1).Kind() != reflect.Ptr || methodType.In(1).Elem().Kind() != reflect.Struct {
+	if methodType.In(1).Kind() != reflect.Ptr {
 		return fmt.Errorf("the second argument should be a struct pointer")
 	}
 
@@ -153,12 +153,13 @@ func (h *ServiceHandler) parseArgument(r *http.Request, params httprouter.Params
 	if err != nil {
 		return err
 	}
-
-	err = formDecoder.Decode(arg, r.Form)
-	if err != nil {
-		return err
+	a := reflect.ValueOf(arg)
+	if a.Kind() == reflect.Struct {
+		err = formDecoder.Decode(arg, r.Form)
+		if err != nil {
+			return err
+		}
 	}
-
 	// json content is prior to query string.
 	if !h.bypassRequestBody && strings.Contains(r.Header.Get("Content-Type"), "application/json") {
 		err := json.NewDecoder(r.Body).Decode(arg)
@@ -166,7 +167,6 @@ func (h *ServiceHandler) parseArgument(r *http.Request, params httprouter.Params
 			return err
 		}
 	}
-
 	// params is prior to json content.
 	if params != nil {
 		paramValues := url.Values{}
@@ -179,12 +179,12 @@ func (h *ServiceHandler) parseArgument(r *http.Request, params httprouter.Params
 			return err
 		}
 	}
-
-	err = h.validator.Struct(arg)
-	if err != nil {
-		return err
+	if a.Kind() == reflect.Struct {
+		err = h.validator.Struct(arg)
+		if err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 
