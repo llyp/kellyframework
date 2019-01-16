@@ -261,7 +261,7 @@ func (h *ServiceHandler) ServeHTTPWithParams(rw http.ResponseWriter, r *http.Req
 
 			logger.Record("methodCallArgument", string(marshaledArgs))
 			logger.Record("methodCallResponseData", string(marshaledData))
-			logger.Record("methodCallBeginTime", beginTime.Format("2006-01-02 03:04:05.999999999"))
+			logger.Record("methodCallBeginTime", beginTime.Format("2006-01-02 15:04:05.999999999"))
 			logger.Record("methodCallDuration", strconv.FormatFloat(duration.Seconds(), 'f', -1, 64))
 		}
 	}
