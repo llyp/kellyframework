@@ -1,20 +1,21 @@
 package kellyframework
 
 import (
-	"reflect"
-	"fmt"
-	"net/http"
 	"context"
-	"io"
-	"time"
-	"gopkg.in/go-playground/validator.v9"
 	"encoding/json"
-	"golang.org/x/net/trace"
-	"strconv"
-	"runtime/debug"
-	"github.com/julienschmidt/httprouter"
+	"fmt"
 	"github.com/gorilla/schema"
+	"github.com/julienschmidt/httprouter"
+	"golang.org/x/net/trace"
+	"gopkg.in/go-playground/validator.v9"
+	"io"
+	"net/http"
 	"net/url"
+	"reflect"
+	"runtime/debug"
+	"strconv"
+	"strings"
+	"time"
 )
 
 type ServiceMethodContext struct {
@@ -126,7 +127,7 @@ func writeFormattedResponse(w http.ResponseWriter, tr trace.Trace, resp *Formatt
 	if resp.Code >= 400 {
 		tr.SetError()
 	}
-	
+
 	setResponseHeader(w)
 	w.WriteHeader(resp.Code)
 	json.NewEncoder(w).Encode(resp)
@@ -159,7 +160,7 @@ func (h *ServiceHandler) parseArgument(r *http.Request, params httprouter.Params
 	}
 
 	// json content is prior to query string.
-	if !h.bypassRequestBody && r.Header.Get("Content-Type") == "application/json" {
+	if !h.bypassRequestBody && strings.Contains(r.Header.Get("Content-Type"), "application/json") {
 		err := json.NewDecoder(r.Body).Decode(arg)
 		if err != nil {
 			return err
