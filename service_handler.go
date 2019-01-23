@@ -76,7 +76,7 @@ func checkServiceMethodPrototype(methodType reflect.Type) error {
 		return fmt.Errorf("the first argument should be type *ServiceMethodContext")
 	}
 
-	if methodType.In(1).Kind() != reflect.Ptr {
+	if methodType.In(1).Kind() != reflect.Ptr || methodType.In(1).Elem().Kind() != reflect.Struct || methodType.In(1).Elem().Kind() != reflect.Slice {
 		return fmt.Errorf("the second argument should be a struct pointer")
 	}
 
@@ -161,7 +161,7 @@ func (h *ServiceHandler) parseArgument(r *http.Request, params httprouter.Params
 		}
 	}
 	// json content is prior to query string.
-	if !h.bypassRequestBody && strings.Contains(r.Header.Get("Content-Type"), "application/json") {
+	if !h.bypassRequestBody && strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
 		err := json.NewDecoder(r.Body).Decode(arg)
 		if err != nil {
 			return err
