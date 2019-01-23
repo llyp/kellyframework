@@ -76,8 +76,8 @@ func checkServiceMethodPrototype(methodType reflect.Type) error {
 		return fmt.Errorf("the first argument should be type *ServiceMethodContext")
 	}
 
-	if methodType.In(1).Kind() != reflect.Ptr || methodType.In(1).Elem().Kind() != reflect.Struct || methodType.In(1).Elem().Kind() != reflect.Slice {
-		return fmt.Errorf("the second argument should be a struct pointer")
+	if methodType.In(1).Kind() != reflect.Ptr || (methodType.In(1).Elem().Kind() != reflect.Struct && methodType.In(1).Elem().Kind() != reflect.Slice) {
+		return fmt.Errorf("the second argument should be a struct pointer or slice pointer")
 	}
 
 	if methodType.NumOut() != 1 {
