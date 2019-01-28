@@ -154,7 +154,7 @@ func (h *ServiceHandler) parseArgument(r *http.Request, params httprouter.Params
 		return err
 	}
 	a := reflect.ValueOf(arg)
-	if a.Kind() == reflect.Struct {
+	if a.Elem().Kind() == reflect.Struct {
 		err = formDecoder.Decode(arg, r.Form)
 		if err != nil {
 			return err
